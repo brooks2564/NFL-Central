@@ -1,0 +1,377 @@
+{
+  "name": "nfl-central",
+  "author": "Brooman Inks",
+  "version": "1.0.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "NFL Central",
+    "shortName": "NFL Central",
+    "longName": "NFL Central",
+    "uuid": "f7482335-2aab-4725-b049-172582e20088",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "emery",
+      "gabbro"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "capabilities": [
+      "configurable"
+    ],
+    "messageKeys": {
+      "REQ": 1,
+      "ARG": 2,
+      "TYPE": 3,
+      "DATA": 4,
+      "FAV_TEAM": 5,
+      "FOLLOW": 6,
+      "VIBRATE": 7,
+      "AUTO_OPEN": 8,
+      "WAKE_TIME": 9,
+      "ERROR": 10,
+      "RED_ZONE": 11,
+      "CLOSE_GAME": 12
+    },
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "IMAGE_MENU_ICON",
+          "file": "images/menu_icon.png",
+          "menuIcon": true
+        },
+        {
+          "type": "bitmap",
+          "name": "IMAGE_FOOTBALL",
+          "file": "images/football.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_BUF_LG",
+          "file": "images/logos/BUF_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_BUF_SM",
+          "file": "images/logos/BUF_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_MIA_LG",
+          "file": "images/logos/MIA_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_MIA_SM",
+          "file": "images/logos/MIA_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_NE_LG",
+          "file": "images/logos/NE_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_NE_SM",
+          "file": "images/logos/NE_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_NYJ_LG",
+          "file": "images/logos/NYJ_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_NYJ_SM",
+          "file": "images/logos/NYJ_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_BAL_LG",
+          "file": "images/logos/BAL_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_BAL_SM",
+          "file": "images/logos/BAL_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_CIN_LG",
+          "file": "images/logos/CIN_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_CIN_SM",
+          "file": "images/logos/CIN_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_CLE_LG",
+          "file": "images/logos/CLE_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_CLE_SM",
+          "file": "images/logos/CLE_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_PIT_LG",
+          "file": "images/logos/PIT_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_PIT_SM",
+          "file": "images/logos/PIT_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_HOU_LG",
+          "file": "images/logos/HOU_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_HOU_SM",
+          "file": "images/logos/HOU_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_IND_LG",
+          "file": "images/logos/IND_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_IND_SM",
+          "file": "images/logos/IND_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_JAX_LG",
+          "file": "images/logos/JAX_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_JAX_SM",
+          "file": "images/logos/JAX_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_TEN_LG",
+          "file": "images/logos/TEN_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_TEN_SM",
+          "file": "images/logos/TEN_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_DEN_LG",
+          "file": "images/logos/DEN_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_DEN_SM",
+          "file": "images/logos/DEN_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_KC_LG",
+          "file": "images/logos/KC_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_KC_SM",
+          "file": "images/logos/KC_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_LV_LG",
+          "file": "images/logos/LV_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_LV_SM",
+          "file": "images/logos/LV_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_LAC_LG",
+          "file": "images/logos/LAC_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_LAC_SM",
+          "file": "images/logos/LAC_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_DAL_LG",
+          "file": "images/logos/DAL_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_DAL_SM",
+          "file": "images/logos/DAL_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_NYG_LG",
+          "file": "images/logos/NYG_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_NYG_SM",
+          "file": "images/logos/NYG_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_PHI_LG",
+          "file": "images/logos/PHI_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_PHI_SM",
+          "file": "images/logos/PHI_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_WSH_LG",
+          "file": "images/logos/WSH_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_WSH_SM",
+          "file": "images/logos/WSH_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_CHI_LG",
+          "file": "images/logos/CHI_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_CHI_SM",
+          "file": "images/logos/CHI_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_DET_LG",
+          "file": "images/logos/DET_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_DET_SM",
+          "file": "images/logos/DET_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_GB_LG",
+          "file": "images/logos/GB_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_GB_SM",
+          "file": "images/logos/GB_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_MIN_LG",
+          "file": "images/logos/MIN_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_MIN_SM",
+          "file": "images/logos/MIN_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_ATL_LG",
+          "file": "images/logos/ATL_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_ATL_SM",
+          "file": "images/logos/ATL_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_CAR_LG",
+          "file": "images/logos/CAR_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_CAR_SM",
+          "file": "images/logos/CAR_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_NO_LG",
+          "file": "images/logos/NO_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_NO_SM",
+          "file": "images/logos/NO_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_TB_LG",
+          "file": "images/logos/TB_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_TB_SM",
+          "file": "images/logos/TB_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_ARI_LG",
+          "file": "images/logos/ARI_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_ARI_SM",
+          "file": "images/logos/ARI_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_LAR_LG",
+          "file": "images/logos/LAR_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_LAR_SM",
+          "file": "images/logos/LAR_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_SF_LG",
+          "file": "images/logos/SF_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_SF_SM",
+          "file": "images/logos/SF_SM.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_SEA_LG",
+          "file": "images/logos/SEA_LG.png"
+        },
+        {
+          "type": "bitmap",
+          "name": "LOGO_SEA_SM",
+          "file": "images/logos/SEA_SM.png"
+        }
+      ]
+    }
+  }
+}

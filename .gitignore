@@ -1,0 +1,5 @@
+build/
+.lock-waf*
+node_modules/
+*.pbw
+src/pkjs/sim.json
