@@ -22,7 +22,7 @@ The field is drawn like a real one: end zones in each team's colors, a line ever
 
 While the app is open, you get a vibration for your team, or any team you follow, in these cases. Each one can be turned off in settings.
 
-- **Scores**: touchdowns, field goals and safeties, with an animated popup showing the ball sailing through the uprights. Extra points and two-point tries do not trigger their own alert.
+- **Scores**: touchdowns, field goals and safeties get an animated popup with the football going through the uprights. The headline says what it was (TOUCHDOWN!, FIELD GOAL! or SAFETY!), and under it you see who scored and how far, like "Z. Flowers, 19 yd pass" or "T. Loop, 64 yd field goal", plus the score. Extra points and two-point tries do not trigger their own alert.
 - **Red zone**: your offense just got inside the 20
 - **Close game**: a one-score game (8 points or less) in the 4th quarter or overtime. It fires once per game and is the buzz that tells you to start watching.
 

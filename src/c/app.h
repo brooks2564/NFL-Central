@@ -19,7 +19,7 @@ enum {
 // ── Table: phone data is rows separated by '\n', fields separated by '|' ──
 #define TABLE_BUF       4096
 #define TABLE_MAX_ROWS  64
-#define TABLE_MAX_COLS  10
+#define TABLE_MAX_COLS  12
 
 typedef struct {
   char buf[TABLE_BUF];
@@ -83,8 +83,13 @@ ListWindow *list_window_push_team_chooser(void);
 const char *static_content(const char *name);
 
 // ── Score celebration (score.c) ───────────────────────────────────────────
-void score_draw(GContext *ctx, GRect bounds, int frame, const char *title, const char *line2);
-void score_popup_show(const char *abbr, const char *title, const char *line2);
+// A football flies through the uprights. `title` is the headline
+// ("TOUCHDOWN!"), `who` is who scored ("J. Smith-Njigba"), `what` is the play
+// ("19 yd pass") and `line2` is the score. Any of them can be empty.
+void score_draw(GContext *ctx, GRect bounds, int frame, const char *title,
+                const char *who, const char *what, const char *line2);
+void score_popup_show(const char *abbr, const char *title, const char *who, const char *what,
+                      const char *line2);
 // What a jump in a team's score means: "TOUCHDOWN!", "FIELD GOAL!", "SAFETY!"
 // or NULL (extra points and two-point tries). `td_pending` is per team and
 // per game: it is set after a bare 6 so that the 1 or 2 that follows is

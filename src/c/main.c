@@ -1,5 +1,8 @@
 // ── NFL Central · watch app ────────────────────────────────────────────────
 #include "app.h"
+#if __has_include("debug.h")
+#include "debug.h"
+#endif
 
 #define PERSIST_SETTINGS  1
 #define WAKEUP_COOKIE     1
@@ -91,6 +94,12 @@ static void on_tracker_change(void) {
 }
 
 // ── App lifecycle ─────────────────────────────────────────────────────────
+#ifdef CELEB_DEBUG_TITLE
+static void debug_show(void *ctx) {
+  score_popup_show("BAL", CELEB_DEBUG_TITLE, CELEB_DEBUG_WHO, CELEB_DEBUG_WHAT, CELEB_DEBUG_LINE);
+}
+#endif
+
 static void init(void) {
   if (persist_exists(PERSIST_SETTINGS)) {
     persist_read_data(PERSIST_SETTINGS, &g_settings, sizeof(g_settings));
@@ -103,6 +112,9 @@ static void init(void) {
   comm_init(on_settings);
   build_home();
   tracker_init(on_tracker_change);
+#ifdef CELEB_DEBUG_TITLE
+  app_timer_register(2500, debug_show, NULL);
+#endif
 }
 
 static void deinit(void) {

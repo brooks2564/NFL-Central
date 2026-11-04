@@ -3,3 +3,4 @@ build/
 node_modules/
 *.pbw
 src/pkjs/sim.json
+src/c/debug.h

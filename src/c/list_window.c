@@ -3,7 +3,7 @@
 //   !|secs                                  refresh every `secs` seconds
 //   #|Title                                 section header
 //   T|abbr|name|line1|line2                 team header with big logo
-//   G|away|aScore|home|hScore|status|sub|state   scoreboard (state P/L/F)
+//   G|away|aScore|home|hScore|status|sub|state|who|what   scoreboard (state P/L/F)
 //   F|away|home|pos|poss|redzone            field graphic (pos 0-100 from the away goal line)
 //   M|away|aScore|home|hScore|status|gameId|state  game row (state P/L/F/S)
 //   S|abbr|tag|score|text                   scoring play (text wraps to two lines)
@@ -52,6 +52,8 @@ struct ListWindow {
   AppTimer *flash_timer;
   char flash_abbr[4];
   char flash_title[20];
+  char flash_who[28];
+  char flash_what[28];
   char flash_line[40];
   bool td_pending[2];      // away, home: last score was a bare touchdown
 };
@@ -141,7 +143,12 @@ static void flash_tick(void *ctx) {
   layer_mark_dirty(menu_layer_get_layer(lw->menu));
 }
 
-static void start_flash(ListWindow *lw, const char *abbr, const char *title, const char *line) {
+static void start_flash(ListWindow *lw, const char *abbr, const char *title, const char *who,
+                        const char *what, const char *line) {
+  strncpy(lw->flash_who, who, sizeof(lw->flash_who) - 1);
+  lw->flash_who[sizeof(lw->flash_who) - 1] = '\0';
+  strncpy(lw->flash_what, what, sizeof(lw->flash_what) - 1);
+  lw->flash_what[sizeof(lw->flash_what) - 1] = '\0';
   strncpy(lw->flash_abbr, abbr, sizeof(lw->flash_abbr) - 1);
   lw->flash_abbr[sizeof(lw->flash_abbr) - 1] = '\0';
   strncpy(lw->flash_title, title, sizeof(lw->flash_title) - 1);
@@ -169,10 +176,10 @@ static void check_score(ListWindow *lw) {
     const char *title;
     snprintf(line, sizeof(line), "%s %d - %d %s", F(1), as, hs, F(3));
     if (as > lw->away && (title = score_event_title(as - lw->away, &lw->td_pending[0]))) {
-      start_flash(lw, F(1), title, line);
+      start_flash(lw, F(1), title, F(8), F(9), line);
     }
     if (hs > lw->home && (title = score_event_title(hs - lw->home, &lw->td_pending[1]))) {
-      start_flash(lw, F(3), title, line);
+      start_flash(lw, F(3), title, F(8), F(9), line);
     }
   }
   lw->has_score = true;
@@ -314,9 +321,13 @@ static void draw_team_header(GContext *ctx, GRect b, ListWindow *lw, int row, bo
 
 static void draw_scoreboard(GContext *ctx, GRect b, ListWindow *lw, int row, bool hl) {
   if (lw->flash_frame > 0) {
-    score_draw(ctx, GRect(0, 0, b.size.w, b.size.h), lw->flash_frame % 16, lw->flash_title, lw->flash_line);
+    score_draw(ctx, GRect(0, 0, b.size.w, b.size.h), lw->flash_frame % 16, lw->flash_title, lw->flash_who,
+               lw->flash_what, lw->flash_line);
     return;
   }
+  // The scoreboard is always black, even while it is the selected row
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_rect(ctx, b, 0, GCornerNone);
   int x = s_pad, w = b.size.w - 2 * s_pad, cx = b.size.w / 2;
   char state = F(7)[0];
   const char *away = F(1), *home = F(3);
@@ -335,9 +346,9 @@ static void draw_scoreboard(GContext *ctx, GRect b, ListWindow *lw, int row, boo
     text(ctx, "-", FONT_KEY_GOTHIC_28_BOLD, GRect(cx - 8, 4, 16, 32), GTextAlignmentCenter);
   }
 
-  graphics_context_set_text_color(ctx, hl ? GColorWhite : (state == 'L' ? GColorGreen : GColorWhite));
+  graphics_context_set_text_color(ctx, state == 'L' ? GColorGreen : GColorWhite);
   text(ctx, F(5), FONT_KEY_GOTHIC_24_BOLD, GRect(x, 54, w, 28), GTextAlignmentCenter);
-  graphics_context_set_text_color(ctx, hl ? GColorWhite : GColorLightGray);
+  graphics_context_set_text_color(ctx, GColorLightGray);
   text(ctx, F(6), FONT_KEY_GOTHIC_18, GRect(x, 80, w, 22), GTextAlignmentCenter);
 }
 

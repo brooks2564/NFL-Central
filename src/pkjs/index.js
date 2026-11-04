@@ -53,6 +53,9 @@ var gSettings = loadSettings();
 // .gitignore and never ships.
 var SIM = null;
 try { SIM = require("./sim.json"); } catch (e) { SIM = null; }
+if (SIM && SIM.__settings) {
+  for (var simKey in SIM.__settings) gSettings[simKey] = SIM.__settings[simKey];
+}
 
 // ── Sending to the watch (one message at a time) ──────────────────────────
 var gQueue = [];
@@ -268,12 +271,65 @@ function redZoneTeam(comp) {
   return poss === 0 ? abbrOf(side(comp, "away")) : poss === 1 ? abbrOf(side(comp, "home")) : "";
 }
 
-function matchupRow(ev) {
+// Who scored and how, from the latest scoring play, for the celebration
+// popup: {who: "J. Smith-Njigba", what: "19 yd pass"}. ESPN's text looks like
+//   "Zay Flowers 19 Yd pass from Lamar Jackson (Tyler Loop Kick)"
+//   "Derrick Henry 5 Yd Rush (Tyler Loop Kick)"
+//   "Tyler Loop 64 Yd Field Goal"
+// Only trusted when that play's score matches the scoreboard's, so a summary
+// that lags behind never describes the wrong play.
+function shortName(full) {
+  var i = full.indexOf(" ");
+  return i < 0 ? full : full.charAt(0) + ". " + full.substring(i + 1);
+}
+
+function scoreDetail(summary, away, home) {
+  var none = { who: "", what: "" };
+  var plays = (summary && summary.scoringPlays) || [];
+  var last = plays[plays.length - 1];
+  if (!last || last.awayScore !== away || last.homeScore !== home) return none;
+  var text = String(last.text || "").replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
+  var m = /^(.+?)\s+(\d+)\s+Yd\s+(.+?)(?:\s+from\s+.+)?$/i.exec(text);
+  if (!m) {   // safeties and anything unusual: just name the team
+    var team = (last.team || {}).abbreviation || "";
+    return { who: TEAMS[team] || team, what: /safety/i.test(((last.type || {}).text) || text) ? "safety" : "" };
+  }
+  var play = m[3].toLowerCase();
+  if (play === "rush") play = "run";
+  return { who: shortName(m[1]), what: m[2] + " yd " + play };
+}
+
+function matchupRow(ev, detail) {
   var comp = compOf(ev);
   var a = side(comp, "away"), h = side(comp, "home");
+  detail = detail || { who: "", what: "" };
   return row("M", abbrOf(a), scoreOf(a), abbrOf(h), scoreOf(h),
              statusText(comp, ev.date), ev.id, stateOf(comp),
-             (comp.status || {}).period || 0, redZoneTeam(comp));
+             (comp.status || {}).period || 0, redZoneTeam(comp), detail.who, detail.what);
+}
+
+// Looks up the latest scoring play for live games involving a team you
+// follow (one summary request each, cached briefly), then calls back with
+// {gameId: detail}.
+function liveDetails(events, cb) {
+  var details = {}, jobs = [];
+  events.forEach(function (ev) {
+    var comp = compOf(ev);
+    var a = abbrOf(side(comp, "away")), h = abbrOf(side(comp, "home"));
+    var followed = [a, h].some(function (t) {
+      return t === gSettings.fav || gSettings.follow.indexOf(t) >= 0;
+    });
+    if (followed && stateOf(comp) === "L") jobs.push(ev);
+  });
+  var pending = jobs.length;
+  if (!pending) return cb(details);
+  jobs.forEach(function (ev) {
+    var comp = compOf(ev);
+    getJSON(SITE + "summary?event=" + ev.id, 15, function (err, sum) {
+      if (!err) details[ev.id] = scoreDetail(sum, scoreOf(side(comp, "away")), scoreOf(side(comp, "home")));
+      if (--pending === 0) cb(details);
+    });
+  });
 }
 
 function findEvent(events, abbr) {
@@ -290,7 +346,7 @@ function byeList(data) {
 
 // ── Games lists ───────────────────────────────────────────────────────────
 // One section per day. `label` ("Week 8") leads the first day's header.
-function gameSections(data, label) {
+function gameSections(data, label, details) {
   // Future playoff rounds list placeholder teams until the matchups are set
   var events = ((data && data.events) || []).filter(function (ev) {
     var comp = compOf(ev);
@@ -305,7 +361,7 @@ function gameSections(data, label) {
         lastDay = key;
         any = true;
       }
-      rows.push(matchupRow(ev));
+      rows.push(matchupRow(ev, (details || {})[ev.id]));
     });
   var byes = byeList(data);
   if (byes.length) {
@@ -326,7 +382,9 @@ function sendGames(arg) {
     if (!mine) {
       rows.push(byeList(data).indexOf(gSettings.fav) >= 0 ? "N|Bye week" : "N|No game this week");
     }
-    sendRows(REQ_GAMES, arg, rows.concat(gameSections(data, label)));
+    liveDetails(data.events || [], function (details) {
+      sendRows(REQ_GAMES, arg, rows.concat(gameSections(data, label, details)));
+    });
   });
 }
 
@@ -460,7 +518,9 @@ function sendGame(arg) {
               (sit.possessionText ? " at " + sit.possessionText : "");
       }
       var rows = ["!|" + (st === "L" ? 15 : st === "P" ? 120 : 0)];
-      rows.push(row("G", away, scoreOf(a), home, scoreOf(h), statusText(comp, date), sub, st));
+      var detail = st === "L" ? scoreDetail(sum, scoreOf(a), scoreOf(h)) : { who: "", what: "" };
+      rows.push(row("G", away, scoreOf(a), home, scoreOf(h), statusText(comp, date), sub, st,
+                    detail.who, detail.what));
       if (st === "L" && sit && sit.possessionText) {
         rows.push(row("F", away, home, fieldPos(sit, away, home), possessionOf(comp, sit),
                       sit.isRedZone ? 1 : 0));

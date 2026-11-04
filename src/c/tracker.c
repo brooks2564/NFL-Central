@@ -1,8 +1,9 @@
 // ── Live score tracker: polls this week's games, fires alerts ─────────────
 // Game rows look like:
-//   M|away|awayScore|home|homeScore|status text|gameId|state|quarter|redZoneTeam
+//   M|away|awayScore|home|homeScore|status text|gameId|state|quarter|redZoneTeam|who|what
 // where state is P (pre-game), L (live) or F (final), quarter is 1-4 (5 = OT)
-// and redZoneTeam is the team with the ball inside the 20, if any.
+// redZoneTeam is the team with the ball inside the 20, if any. who and what
+// describe the latest scoring play ("J. Smith-Njigba", "19 yd pass").
 // A row "N|text" says why your team has no game this week (a bye).
 #include "app.h"
 
@@ -48,7 +49,8 @@ static void vibrate(const uint32_t *pattern, uint32_t n) {
 
 // Followed teams: vibrate, and show the popup unless that game is on screen
 // (the game screen does its own flashing then).
-static void alert_score(int id, const char *title, const char *scorer,
+static void alert_score(int id, const char *title, const char *who, const char *what,
+                        const char *scorer,
                         const char *away, int as, const char *home, int hs) {
   if (!settings_is_followed(scorer)) return;
   if (g_settings.vibrate) {
@@ -60,7 +62,7 @@ static void alert_score(int id, const char *title, const char *scorer,
   if (id == g_viewing_game) return;
   char line[40];
   snprintf(line, sizeof(line), "%s %d - %d %s", away, as, hs, home);
-  score_popup_show(scorer, title, line);
+  score_popup_show(scorer, title, who, what, line);
 }
 
 static void on_games(const char *data, const char *error, void *ctx) {
@@ -88,6 +90,8 @@ static void on_games(const char *data, const char *error, void *ctx) {
     char state = table_get(s_table, r, 7)[0];
     int quarter = atoi(table_get(s_table, r, 8));
     const char *rz = table_get(s_table, r, 9);
+    const char *who = table_get(s_table, r, 10);
+    const char *what = table_get(s_table, r, 11);
     if (id == 0) continue;
 
     Game *g = find_game(id);
@@ -101,10 +105,10 @@ static void on_games(const char *data, const char *error, void *ctx) {
       if (state == 'L') {
         const char *title;
         if (as > g->away && (title = score_event_title(as - g->away, &g->td_pending[0]))) {
-          alert_score(id, title, away, away, as, home, hs);
+          alert_score(id, title, who, what, away, away, as, home, hs);
         }
         if (hs > g->home && (title = score_event_title(hs - g->home, &g->td_pending[1]))) {
-          alert_score(id, title, home, away, as, home, hs);
+          alert_score(id, title, who, what, home, away, as, home, hs);
         }
       }
       g->away = as;
@@ -125,8 +129,8 @@ static void on_games(const char *data, const char *error, void *ctx) {
           vibrate(pattern, 5);
           if (id != g_viewing_game) {
             char line[40];
-            snprintf(line, sizeof(line), "%s %d-%d %s %s", away, as, hs, home, status);
-            score_popup_show(settings_is_followed(away) ? away : home, "CLOSE GAME!", line);
+            snprintf(line, sizeof(line), "%s %d - %d %s", away, as, hs, home);
+            score_popup_show(settings_is_followed(away) ? away : home, "CLOSE GAME!", "One-score game", status, line);
           }
         }
       }
