@@ -153,8 +153,12 @@ def main():
     os.makedirs(SHOTS, exist_ok=True)
     os.makedirs(RES, exist_ok=True)
     draw_menu_icon().save(os.path.join(RES, "menu_icon.png"))
-    for size in (144, 80, 25):
-        draw_icon(size).save(os.path.join(SHOTS, "icon_%d.png" % size))
+    # 144 px gets the app's football at a whole-number scale; the smaller
+    # sizes are shrunk from the big banner-size icon
+    big = draw_icon(240, app_ball=True)
+    draw_icon(144, app_ball=True).save(os.path.join(SHOTS, "icon_144.png"))
+    for size in (80, 25):
+        big.resize((size, size), Image.LANCZOS).save(os.path.join(SHOTS, "icon_%d.png" % size))
     draw_banner().save(os.path.join(SHOTS, "banner.png"))
     print("done")
 
