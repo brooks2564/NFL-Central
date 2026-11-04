@@ -62,8 +62,12 @@ def football(n, body=BROWN, edge=DARK_BROWN, lace=WHITE, angle=35):
     return img.resize((n, n), Image.LANCZOS)
 
 
-def draw_icon(size):
-    """Green field with yard lines, yellow uprights and a tilted football."""
+def draw_icon(size, app_ball=False):
+    """Green field with yard lines, yellow uprights and a tilted football.
+
+    With app_ball=True the football is the same pixel icon the app uses on the
+    field graphic, scaled up by a whole number so its edges stay crisp.
+    """
     n = size * SS
     img = Image.new("RGB", (n, n), BLACK)
     d = ImageDraw.Draw(img)
@@ -77,6 +81,17 @@ def draw_icon(size):
     # uprights: stem, crossbar, two posts
     w = max(3, int(n * 0.035))
     cx = n * 0.5
+    if app_ball:   # smaller posts so the bigger ball has room
+        d.line([(cx, n * 0.27), (cx, n * 0.19)], fill=YELLOW, width=w)
+        d.line([(n * 0.34, n * 0.19), (n * 0.66, n * 0.19)], fill=YELLOW, width=w)
+        d.line([(n * 0.34, n * 0.19), (n * 0.34, n * 0.04)], fill=YELLOW, width=w)
+        d.line([(n * 0.66, n * 0.19), (n * 0.66, n * 0.04)], fill=YELLOW, width=w)
+        tile = img.resize((size, size), Image.LANCZOS)
+        ball = Image.open(os.path.join(RES, "football.png")).convert("RGBA")
+        k = int(size * 0.70) // ball.width            # whole-number scale
+        ball = ball.resize((ball.width * k, ball.height * k), Image.NEAREST)
+        tile.paste(ball, ((size - ball.width) // 2, int(size * 0.62 - ball.height / 2)), ball)
+        return tile
     d.line([(cx, n * 0.40), (cx, n * 0.28)], fill=YELLOW, width=w)
     d.line([(n * 0.30, n * 0.28), (n * 0.70, n * 0.28)], fill=YELLOW, width=w)
     d.line([(n * 0.30, n * 0.28), (n * 0.30, n * 0.08)], fill=YELLOW, width=w)
@@ -114,7 +129,7 @@ def draw_menu_icon():
 def draw_banner():
     w, h = 720, 320
     img = Image.new("RGB", (w, h), BLACK)
-    icon = draw_icon(240)
+    icon = draw_icon(240, app_ball=True)
     img.paste(icon, (40, 40))
     d = ImageDraw.Draw(img)
 
